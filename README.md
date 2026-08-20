@@ -1,16 +1,36 @@
-## Hi there 👋
+# Save this file at: .github/workflows/snake.yml
+# It generates the contribution-snake SVG and pushes it to an "output" branch.
 
-<!--
-**mmokshagna/mmokshagna** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+name: Generate Snake Animation
 
-Here are some ideas to get you started:
+on:
+  schedule:
+    - cron: "0 */12 * * *"   # runs twice a day
+  workflow_dispatch:          # lets you run it manually
+  push:
+    branches:
+      - main
 
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Generate snake SVGs
+        uses: Platane/snk@v3
+        id: snake-gif
+        with:
+          github_user_name: ${{ github.repository_owner }}
+          outputs: |
+            dist/snake.svg
+            dist/snake-dark.svg?palette=github-dark
+
+      - name: Push to output branch
+        uses: crazy-max/ghaction-github-pages@v4
+        with:
+          target_branch: output
+          build_dir: dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
